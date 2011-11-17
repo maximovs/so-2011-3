@@ -1,0 +1,4 @@
+/opt/local/bin/mcopy -o bin/kernel.bin b:/boot/
+echo "Armado"
+VBoxManage controlvm tpe reset
+echo "Arrancando VBOX"
