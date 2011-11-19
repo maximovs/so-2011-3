@@ -1,6 +1,6 @@
 # Used for compiling on VBox via SSH
 if [ $PWD == "/root" ]; then
-  cd tp2so
+  cd tp3so
 fi
 
 cd bin
