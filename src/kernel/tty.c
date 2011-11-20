@@ -151,10 +151,9 @@ int tty_main (int argc, char ** argv)
 	char * input;
 	char * username;
 	char * password;
-	printf("Monix v1 - TTY %d\n", tty_number);
-	printf("Marseillan, Pereyra, Videla\n");
+	printf("Monix v2 - TTY %d\n", tty_number);
+	printf("Marseillan y Videla\n");
 	printf("Sistemas Operativos - 2011 - ITBA\n");
-	printf("Dennis Ritchie RIP\n");
 
 	int child;
 	while(1) {
