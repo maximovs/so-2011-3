@@ -25,6 +25,93 @@ void clear_kernel_buffer() {
 	}
 }
 
+
+/*************************************************************
+*initialize_pics
+* Inicializa los PICS, el 1 como Master el 2 como slave
+* y les coloca los offset enviados
+* Recibe: Offset1 para el PIC1
+*	  Offset2 para el PIC2
+**************************************************************/
+void initialize_pics(int offset_pic1, int offset_pic2){
+	unsigned char mask1 = _inb(PIC1_DATA);
+	unsigned char mask2 = _inb(PIC2_DATA);	
+
+	_outb(PIC1_COMMAND, ICW1);
+	_outb(PIC2_COMMAND, ICW1);
+
+	_outb(PIC1_DATA, offset_pic1);
+	_outb(PIC2_DATA, offset_pic2);
+	
+	_outb(PIC1_DATA, 4);
+	_outb(PIC2_DATA, 2);
+
+	_outb(PIC1_DATA, ICW4_8086);
+	_outb(PIC2_DATA, ICW4_8086);
+
+	_outb(PIC1_DATA, mask1);
+	_outb(PIC2_DATA, mask2);
+}
+unsigned char *exception_messages[] =
+{
+    "Division By Zero",
+    "Debug",
+    "Non Maskable Interrupt",
+    "Breakpoint",
+    "Into Detected Overflow",
+    "Out of Bounds",
+    "Invalid Opcode",
+    "No Coprocessor",
+
+    "Double Fault",
+    "Coprocessor Segment Overrun",
+    "Bad TSS",
+    "Segment Not Present",
+    "Stack Fault",
+    "General Protection Fault",
+    "Page Fault",
+    "Unknown Interrupt",
+
+    "Coprocessor Fault",
+    "Alignment Check",
+    "Machine Check",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved"
+};
+int rxz=0;
+void fault_handler(struct regs *r)
+{
+    // if (r->int_no < 32)
+    //   {
+    //       printf("%s", exception_messages[r->int_no]);
+    //       printf(" Exception.\n");
+    //   }
+
+    	 
+    	int i;
+			rxz++;
+			char a='a'+r->int_no;
+    	char start_msg[2] =	{a,0x07};
+    	memcpy((char*)0xb8000 + rxz * 2, start_msg[i], 2); 
+    	// i = 0;
+    	//     	for(; i < 16; ++i)	{
+    	//     		memcpy((char*)0xb8000 + i * 2, start_msg[i], 2);
+    	//     		_setCursor(i);
+    	//     	}
+	_Sti();
+}
 ///////////// Fin de Variables del Kernel
 
 ///////////// Inicio de funciones auxiliares del Kernel.
@@ -433,16 +520,51 @@ void _rtc();
  *************************************************/
 kmain() {
 	int i, num;
-
+	initialize_pics(0x20,0x28);
 	setup_IDT_entry(&idt[0x70], 0x08, (dword) & _rtc, ACS_INT, 0);
 
 	/* CARGA DE IDT CON LA RUTINA DE ATENCION DE IRQ0    */
+	
+	// setup_IDT_entry (&idt[0x00], 0x08, (dword)&_int_00_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x01], 0x08, (dword)&_int_01_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x02], 0x08, (dword)&_int_02_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x03], 0x08, (dword)&_int_03_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x04], 0x08, (dword)&_int_04_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x05], 0x08, (dword)&_int_05_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x06], 0x08, (dword)&_int_06_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x07], 0x08, (dword)&_int_07_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x08], 0x08, (dword)&_int_08_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x09], 0x08, (dword)&_int_09_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x0A], 0x08, (dword)&_int_0A_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x0B], 0x08, (dword)&_int_0B_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x0C], 0x08, (dword)&_int_0C_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x0D], 0x08, (dword)&_int_0D_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x0E], 0x08, (dword)&_int_0E_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x0F], 0x08, (dword)&_int_0F_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x10], 0x08, (dword)&_int_10_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x11], 0x08, (dword)&_int_11_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x12], 0x08, (dword)&_int_12_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x13], 0x08, (dword)&_int_13_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x14], 0x08, (dword)&_int_14_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x15], 0x08, (dword)&_int_15_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x16], 0x08, (dword)&_int_16_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x17], 0x08, (dword)&_int_17_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x18], 0x08, (dword)&_int_18_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x19], 0x08, (dword)&_int_19_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x1A], 0x08, (dword)&_int_1A_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x1B], 0x08, (dword)&_int_1B_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x1C], 0x08, (dword)&_int_1C_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x1D], 0x08, (dword)&_int_1D_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x1E], 0x08, (dword)&_int_1E_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x1F], 0x08, (dword)&_int_1F_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x20], 0x08, (dword)&_int_20_hand, ACS_INT, 0);
+	// setup_IDT_entry (&idt[0x21], 0x08, (dword)&_int_21_hand, ACS_INT, 0);
 
-	setup_IDT_entry(&idt[0x08], 0x08, (dword) & _int_08_hand, ACS_INT, 0);
+	setup_IDT_entry(&idt[0x20], 0x08, (dword) & _timer_tick_hand, ACS_INT, 0);
 
 	/* CARGA DE IDT CON LA RUTINA DE ATENCION DE IRQ1    */
 
-	setup_IDT_entry(&idt[0x09], 0x08, (dword) & _int_09_hand, ACS_INT, 0);
+	setup_IDT_entry(&idt[0x21], 0x08, (dword) & _KB_hand, ACS_INT, 0);
 
 	/* CARGA DE IDT CON LA RUTINA DE ATENCION DE int80h    */
 
@@ -460,6 +582,8 @@ kmain() {
 
 	_lidt(&idtr);	
 	
+	
+	
 	Cli();
 	int rate = 0x06;
 	_outb(0x70, 0x0A); //set index to register A
@@ -467,7 +591,7 @@ kmain() {
 	_outb(0x70, 0x0A); //reset index to A
 	_outb(0x71, (prev & 0xF0) | rate); //write only our rate to A. Note, rate is the bottom 4 bits.
 	
-
+	// initialize_pics(0x20,0x28);
 	scheduler_init();
 
 

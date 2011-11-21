@@ -1,6 +1,15 @@
 GLOBAL  _read_msw,_lidt
-GLOBAL  _int_08_hand
-GLOBAL  _int_09_hand
+GLOBAL  _KB_hand
+GLOBAL  _timer_tick_hand
+;GLOBAL  _int_20_hand, _int_21_hand, _int_2E_hand, _int_80_hand,
+GLOBAL	_int_00_hand, _int_01_hand, _int_02_hand, _int_03_hand
+GLOBAL	_int_04_hand, _int_05_hand, _int_06_hand, _int_07_hand
+GLOBAL	_int_08_hand, _int_09_hand, _int_0A_hand, _int_0B_hand
+GLOBAL	_int_0C_hand, _int_0D_hand, _int_0E_hand, _int_0F_hand
+GLOBAL	_int_10_hand, _int_11_hand, _int_12_hand, _int_13_hand
+GLOBAL	_int_14_hand, _int_15_hand, _int_16_hand, _int_17_hand
+GLOBAL	_int_18_hand, _int_19_hand, _int_1A_hand, _int_1B_hand
+GLOBAL	_int_1C_hand, _int_1D_hand, _int_1E_hand, _int_1F_hand
 GLOBAL	_int_80_hand
 GLOBAL	_int_79_hand
 GLOBAL  _mascaraPIC1,_mascaraPIC2,_Cli,_Sti
@@ -84,6 +93,8 @@ EXTERN	Cli
 EXTERN	kernel_ready
 EXTERN	Sti
 
+EXTERN fault_handler
+
 
 
 
@@ -143,11 +154,11 @@ _lidt:
 		retn
 
 _yield:
-		int 08h
+		int 20h
 		ret
 
 ; Handler de INT 8 (Timer tick)
-_int_08_hand:
+_timer_tick_hand:
 		call Cli
 		pushad
 			mov eax, esp
@@ -296,7 +307,7 @@ _fast_exit:
 		
 		iret
 
-_int_09_hand:
+_KB_hand:
 		call kernel_ready
 		cmp eax, 0
 		jne _09hand
@@ -972,3 +983,188 @@ sleep:
 		mov		eax, [kernel_buffer + 60]
 		call	softyield
 		ret
+		
+_int_00_hand:
+    mov [0xB8000], dword 65
+    push byte 0
+    push byte 0
+    jmp isr_common_stub
+
+_int_01_hand:
+    push byte 0
+    push byte 1
+    jmp isr_common_stub
+
+_int_02_hand:
+    push byte 0
+    push byte 2
+    jmp isr_common_stub
+
+_int_03_hand:
+    push byte 0
+    push byte 3
+    jmp isr_common_stub
+
+_int_04_hand:
+    push byte 0
+    push byte 4
+    jmp isr_common_stub
+
+_int_05_hand:
+    push byte 0
+    push byte 5
+    jmp isr_common_stub  
+
+_int_06_hand:
+    push byte 0
+    push byte 6
+    jmp isr_common_stub   
+
+_int_07_hand:
+    push byte 0
+    push byte 7
+    jmp isr_common_stub
+
+_int_08_hand:
+    push byte 0
+    push byte 8
+    jmp isr_common_stub  
+
+_int_09_hand:
+    push byte 0
+    push byte 9
+    jmp isr_common_stub  
+
+_int_0A_hand:
+    push byte 0
+    push byte 10
+    jmp isr_common_stub  
+
+_int_0B_hand:
+    push byte 0
+    push byte 11
+    jmp isr_common_stub  
+
+_int_0C_hand:
+    push byte 0
+    push byte 12
+    jmp isr_common_stub   
+
+_int_0D_hand:
+    push byte 0
+    push byte 13
+    jmp isr_common_stub
+
+_int_0E_hand:
+    push byte 0
+    push byte 14
+    jmp isr_common_stub 
+
+_int_0F_hand:
+    push byte 0
+    push byte 15
+    jmp isr_common_stub 
+
+_int_10_hand:
+    push byte 0
+    push byte 16
+    jmp isr_common_stub   
+
+_int_11_hand:
+    push byte 0
+    push byte 17
+    jmp isr_common_stub  
+
+_int_12_hand:
+    push byte 0
+    push byte 18
+    jmp isr_common_stub
+
+_int_13_hand:
+    push byte 0
+    push byte 19
+    jmp isr_common_stub 
+
+_int_14_hand:
+    push byte 0
+    push byte 20
+    jmp isr_common_stub 
+
+_int_15_hand:
+    push byte 0
+    push byte 21
+    jmp isr_common_stub
+
+_int_16_hand:
+    push byte 0
+    push byte 22
+    jmp isr_common_stub 
+
+_int_17_hand:
+    push byte 0
+    push byte 23
+    jmp isr_common_stub
+
+_int_18_hand:
+    push byte 0
+    push byte 24
+    jmp isr_common_stub 
+
+_int_19_hand:
+    push byte 0
+    push byte 25
+    jmp isr_common_stub
+
+_int_1A_hand:
+    push byte 0
+    push byte 26
+    jmp isr_common_stub
+
+_int_1B_hand:
+    push byte 0
+    push byte 27
+    jmp isr_common_stub 
+
+_int_1C_hand:
+    push byte 0
+    push byte 28
+    jmp isr_common_stub
+
+_int_1D_hand:
+    push byte 0
+    push byte 29
+    jmp isr_common_stub
+
+_int_1E_hand:
+    push byte 0
+    push byte 30
+    jmp isr_common_stub
+
+_int_1F_hand:
+    push byte 0
+    push byte 31
+    jmp isr_common_stub
+
+		isr_common_stub:
+			pusha
+			push ds
+			push es
+			push fs
+			push gs
+			mov ax, 0x10   ; Load the Kernel Data Segment descriptor!
+			mov ds, ax
+			mov es, ax
+			mov fs, ax
+			mov gs, ax
+			mov eax, esp   ; Push us the stack
+			push eax
+			mov eax, fault_handler
+			call eax       ; A special call, preserves the 'eip' register
+			pop eax
+			pop gs
+			pop fs
+			pop es
+			pop ds
+			popa
+			add esp, 8     ; Cleans up the pushed error code and pushed ISR number
+			iret           ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!

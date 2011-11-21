@@ -26,6 +26,25 @@ typedef int							dword;
 typedef int							size_t;
 typedef short int					ssize_t;
 
+/* Datos PIC */     
+#define PIC1_ADDR		0x20 	/* Direccion de IO del PIC1 */
+#define PIC2_ADDR		0xA0	/* Direccion de IO del PIC2 */
+#define PIC1_COMMAND	PIC1_ADDR
+#define	PIC2_COMMAND	PIC2_ADDR
+#define PIC1_DATA	(PIC1_ADDR+1)
+#define	PIC2_DATA	(PIC2_ADDR+1)
+
+#define	ICW1		0x11
+#define	ICW4_8086	0x01
+
+/* Registros (Pushed by the ASM handler on Exceptions) */
+struct regs
+{
+    unsigned int gs, fs, es, ds;      /* pushed the segs last */
+    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;  /* pushed by 'pusha' */
+    unsigned int int_no, err_code;    /* our 'push byte #' and ecodes do this */
+    unsigned int eip, cs, eflags, useresp, ss;   /* pushed by the processor automatically */ 
+};
 
 /* Flags para derechos de acceso de los segmentos */
 
