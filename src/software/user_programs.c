@@ -111,7 +111,6 @@ int writer_main (int argc, char ** argv)
 int reader_main (int argc, char ** argv) {
 	int fifo = mkfifo("fifo", O_NEW);
 
-	
 	char buff[1024];
 	int len = read(fifo, buff, 1024);	
 	int i = 0;
