@@ -1,6 +1,6 @@
 // The following calls are used by our filesystem to write to the disk.
 #include "../../drivers/atadisk.h"
-#define SECTORS 50
+#define SECTORS 20
 #define SECTOR_SIZE 512
 #define TRUE 1
 #define FALSE 0

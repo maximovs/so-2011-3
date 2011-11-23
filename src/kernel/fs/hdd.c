@@ -19,11 +19,11 @@ void hdd_init() {
 }
 
 void hdd_read(char * answer, unsigned int sector) {
-	_disk_read(ATA0, answer, 2, sector);
+	_cache_read(ATA0, answer, 2, sector);
 }
 
 void hdd_write(char * buffer, unsigned int sector) {
-	_disk_write(ATA0, buffer, 2, sector);
+	_cache_write(ATA0, buffer, 2, sector);
 }
 
 void hdd_close() {

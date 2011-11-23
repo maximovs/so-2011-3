@@ -20,11 +20,12 @@ int _cache_init(){
 }
 
 int _cache_read(int ata, char * ans, int numreads, unsigned int sector){
-int i = 0;
+	int i = 0;
 	if( sector < cache_handler.first_sector || sector + numreads >= cache_handler.first_sector + SECTORS ){
 		if( cache_handler.dirty )
 			_cache_flush();
-		_disk_read(ata, cache_handler.sectors, SECTORS, sector);
+		for( i=0; i<SECTORS/2; i++)	
+			_disk_read(ata, cache_handler.sectors + i*2*SECTOR_SIZE, 2, sector+i*2);
 		cache_handler.first_sector = sector;
 		if(numreads < SECTORS ){
 			for( i=0; i<numreads*SECTOR_SIZE; i++){
@@ -47,8 +48,9 @@ int i = 0;
 }
 
 int _cache_write(int ata, char * msg, int numreads, unsigned int sector){
-	if( sector < cache_handler.first_sector || sector + numreads >= cache_handler.first_sector + SECTORS ){
+	if( sector < cache_handler.first_sector || sector + numreads > cache_handler.first_sector + SECTORS ){
 		_cache_flush();
+		
 		return _disk_write(ata, msg, numreads, sector);
 	}
 	else{
@@ -65,5 +67,10 @@ int _cache_write(int ata, char * msg, int numreads, unsigned int sector){
 
 int _cache_flush(void){
 	cache_handler.dirty = FALSE;
-	return _disk_write(ATA0, cache_handler.sectors, SECTORS, cache_handler.first_sector);
+	int i = 0;
+	for( i=0; i<SECTORS/2; i++ ){
+		_disk_write(ATA0, cache_handler.sectors + SECTOR_SIZE*i*2, 2, cache_handler.first_sector+i*2);
+	}
+	return 1;
+		
 }
