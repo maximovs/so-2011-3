@@ -9,10 +9,11 @@ size_t offset;
 // Roughly allocs some memory
 void * malloc(size_t size)
 {
-     void* ret = 0;
-     ret = heap_space + offset;
-     offset += size;
-     return ret;
+	void* ret = 0;
+	ret = heap_space + offset;
+	offset += size;
+	return ret;
+	//return (void*)_sys_malloc(size);
 }
 
 // Roughly callocs some memory
@@ -39,7 +40,8 @@ void * realloc(void * ptr, size_t size,size_t old_size)
 // The cake is a lie, but the cake follows the standard implementation.
 void free(void* ptr)
 {
-     return;
+//	_sys_free(ptr);
+	return;
 }
 
 int time_lies = 0;

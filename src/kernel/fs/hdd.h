@@ -21,4 +21,8 @@ void hdd_write(char * buffer, unsigned int sector);
 
 void hdd_close();
 
+void hdd_goCacheless();
+
+void hdd_goCache();
+
 #endif
