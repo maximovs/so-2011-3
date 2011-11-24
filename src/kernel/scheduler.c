@@ -318,18 +318,18 @@ int sched_pcreate(char * name, int argc, void * params) {
 }
 
 // User processes names
-char* _function_names[] = { "help", "test", "clear", "ssh", "hola", "reader", "writer", 
+char* _function_names[] = { "help", "testcache", "clear", "ssh", "hola", "reader", "writer", 
 	"kill", "getc", "putc", "top", "hang", "setp", "setsched", "dcheck", 
 	"dread", "dwrite", "dfill", "ls", "cd", "pwd", "mkdir", "rm", "touch", "cat", "fwrite",
 	"logout", "makeuser", "setgid", "udelete", "chown", "chmod", "getown", "getmod", "fbulk",
-	"finfo", "su", "link", "cp", "mv", "smallhang", "fsstat", NULL };
+	"finfo", "su", "link", "cp", "mv", "smallhang", "fsstat", "cacheon", "cacheoff", NULL };
 
 // User processes pointers
 int ((*_functions[])(int, char**)) = { _printHelp, _test, _clear, _ssh, _hola_main, 
 	reader_main, writer_main, _kill, getc_main, putc_main, top_main, _hang, 
 	_setp, _setsched, _dcheck, _dread, _dwrite, _dfill, _ls, _cd, _pwd, _mkdir, _rm, _touch,
 	_cat, _fwrite, _logout, _makeuser, _setgid, _udelete, _chown, _chmod, _getown, _getmod, _fbulk,
-	_finfo, _su, _link, _cp, _mv, _smallhang, _fsstat, NULL };
+	_finfo, _su, _link, _cp, _mv, _smallhang, _fsstat, _cacheon, _cacheoff, NULL };
 
 // Makes a pointer from a function string given
 main_pointer sched_ptr_from_string(char * string) {
@@ -386,7 +386,7 @@ int is_tty, int stdin, int stdout, int stderr, int argc, void * params, int queu
 	p->gid                 = 0;
 	p->ppid                = (current_process != NULL) ? current_process->pid : 0;
 	p->priority            = priority;
-	p->esp                 = stackf_build(p->stack, _main, argc, params);
+	p->esp                 = stackf_build(p->stack, _main, argc, params); //acá tengo que tocar algo para asignar el stack a la página q quiero
 	p->state               = PROCESS_READY;
 	p->file_descriptors[0] = fd_open_with_index(stdin,0,0,0);
 	p->file_descriptors[1] = fd_open_with_index(stdout,0,0,0);
