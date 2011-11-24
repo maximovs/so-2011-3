@@ -263,6 +263,9 @@ void fsstat(int * data);
 
 void sleep(int msecs);
 
+block_t getKernelMem();
+void setKernelMem(block_t aux);
+
 int logout();
 
 #endif

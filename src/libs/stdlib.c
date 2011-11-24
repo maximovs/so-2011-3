@@ -1,18 +1,22 @@
 #include "stdlib.h"
+#include "../kernel/mem/mem.h"
 #include "../monix/monix.h"
 
 //***** All the following code is just not cool, but it works ¨*****//
 
-char heap_space[1024*1024*16];
+// char heap_space[1024*1024*16];
+char* heap_space;
 size_t offset;
 
 // Roughly allocs some memory
 void * malloc(size_t size)
+
 {
-	void* ret = 0;
-	ret = heap_space + offset;
-	offset += size;
-	return ret;
+	return s_malloc(size);
+	// void* ret = 0;
+	// ret = heap_space + offset;
+	// offset += size;
+	// return ret;
 	//return (void*)_sys_malloc(size);
 }
 

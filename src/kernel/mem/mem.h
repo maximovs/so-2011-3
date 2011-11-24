@@ -1,6 +1,7 @@
 #ifndef _MEM_H_
 #define _MEM_H_
 #include "../../../include/defs.h"
+#include "../scheduler.h"
 
 // #include "klib.h"
 
@@ -50,15 +51,6 @@ enum {
  * */
 void _startPaging(int kbytes);
 
-struct block_t {
-	struct block_t * next;
-	void * firstPage;
-	unsigned int npages;
-	unsigned int freeSpace;
-	void * ptrFreeMemory;
-};
-
-typedef struct block_t * block_t;
 
 int _pageUp(void * pg);
 int _pageDown(void * pg);
@@ -73,7 +65,7 @@ void        _pd_togglePresent(pentry_t*);
 
 // void* _reqpage(task_t task);
 
-// void* malloc(size_t size);
+void* s_malloc(size_t size);
 // void free(void *pointer);
 
 struct PagingNamespace {

@@ -17,7 +17,7 @@ static int cache;
 
 void hdd_init() {
 	// Nothing to do on this end.
-	cache = 1;
+	cache = 0;
 }
 
 void hdd_read(char * answer, unsigned int sector) {

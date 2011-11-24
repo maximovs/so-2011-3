@@ -37,6 +37,17 @@ typedef short int					ssize_t;
 #define	ICW1		0x11
 #define	ICW4_8086	0x01
 
+
+struct block_t {
+	struct block_t * next;
+	void * firstPage;
+	unsigned int npages;
+	unsigned int freeSpace;
+	void * ptrFreeMemory;
+};
+
+typedef struct block_t * block_t;
+
 /* Registros (Pushed by the ASM handler on Exceptions) */
 struct regs
 {

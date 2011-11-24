@@ -239,7 +239,7 @@ void clear_screen_topdown() {
 	int x = getCursorX();
 	int y = getCursorY();
 	setCursor(FALSE);
-	// while (i++ < (current_video_mode->width * (current_video_mode->height GPF-solved???
+	// while (i++ < (current_video_mode->width * (current_video_mode->height //GPF-solved???
 	// 		 			- y)) - x) {
 	// 		 		putchar(' ');
 	// 		 	}

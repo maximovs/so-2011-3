@@ -144,7 +144,7 @@ void setup_IDT_entry(DESCR_INT *item, byte selector, dword offset, byte access, 
 ///////////// Fin de funciones auxiliares del kernel.
 
 ///////////// Inicio Handlers de interrupciones.
-
+block_t kernelMem=NULL;
 int krn = 0;
 
 int ready = 0;
@@ -153,7 +153,14 @@ int ready = 0;
 void setready() {
 	ready = 1;
 }
+block_t getKernelMem(){
+	return kernelMem;
+}
 
+void setKernelMem(block_t aux){
+	if(kernelMem==NULL)
+		kernelMem=aux;
+}
 // Tells if the kernel is ready
 int kernel_rd() {
 	return ready;
@@ -601,7 +608,7 @@ kmain() {
 	_outb(0x70, 0x0A); //reset index to A
 	_outb(0x71, (prev & 0xF0) | rate); //write only our rate to A. Note, rate is the bottom 4 bits.
 	
-	
+		
 
 	scheduler_init();
 

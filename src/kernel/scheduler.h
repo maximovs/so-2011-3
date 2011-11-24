@@ -1,6 +1,7 @@
 #include "../../include/kernel.h"
 #include "../../include/kasm.h"
 #include "../../include/defs.h"
+#include "mem/mem.h"
 
 #include "../libs/queue.h"
 #include "../monix/monix.h"
@@ -35,6 +36,7 @@ typedef struct Process {
 	int					sleeptime;
 	void *				signals[PROCESS_SIGNALS];
 	Queue				* wait_queue;
+	block_t				mem;
 } Process;
 
 ////// Stackframe, built on process creation.

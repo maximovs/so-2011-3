@@ -8,7 +8,6 @@
 #include "../libs/queue.h"
 #include "../libs/mcglib.h"
 #include "../monix/monix.h"
-#include "mem/mem.h"
 
 int _first_time          = 0;
 int thinked              = 0;
@@ -122,10 +121,11 @@ void scheduler_init() {
 	for( i=0; i < PROCESS_MAX * sizeof(Process); i++) {
 		*pool = (char) 0;
 	}
+	
 	for( i=0; i< PROCESS_MAX; i++ ){
-		process_pool[i].stack = (char *)_sys_malloc(2*PAGESIZE);
+		process_pool[i].stack = (char *)s_malloc(2*PAGESIZE);
 		process_pool[i].stackPages = 2;
-		process_pool[i].heap = (char *)_sys_malloc(2*PAGESIZE);
+		process_pool[i].heap = (char *)s_malloc(2*PAGESIZE);
 		process_pool[i].heapPages = 2;
 	}
 	
@@ -293,6 +293,7 @@ int sched_prun(int pid) {
 process (or himself if it's the tty the current process)*/
 int sched_waitpid(int pid) {
 	Process * p = process_getbypid(pid);
+	
 	if(p != NULL)
 	{
 		if (current_process->is_tty) {
@@ -543,22 +544,25 @@ int scheduler_sleep(int msecs) {
 
 // Handles the ticks
 void scheduler_tick() {
+
 	int i = 0;
 	if( (int)(current_process->stack + current_process->stackPages * PAGESIZE - current_process->esp) < EPSILON ){
-		char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages);
+		char * buffer = (char *)s_malloc(PAGESIZE * current_process->stackPages);
 		int i = 0;
 		for( i = 0; i<PAGESIZE * current_process->stackPages; i++ ){
 			buffer[i] = current_process->stack[i];
 		}
-		current_process->stack = (char *) _getFreePages(current_process->stackPages + 1);
+		// current_process->stack = (char *) _getFreePages(current_process->stackPages + 1);
+		current_process->stack = (char *) s_malloc(current_process->stackPages + 1);		
 	}
 	else if( current_process->stackPages != 2 && (int)(current_process->stack + current_process->stackPages * PAGESIZE - current_process->esp) > DELTA ){
-		char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages -1);
+		char * buffer = (char *)s_malloc(PAGESIZE * current_process->stackPages -1);
 		int i = 0;
 		for( i = 0; i<PAGESIZE * (current_process->stackPages-1); i++ ){
 			buffer[i] = current_process->stack[i];
 		}
-		current_process->stack = (char *) _getFreePages(current_process->stackPages - 1);
+		current_process->stack = (char *) s_malloc(current_process->stackPages + 1);
+		// current_process->stack = (char *) _getFreePages(current_process->stackPages - 1);
 	}
 	for(; i < PROCESS_MAX; ++i)	{
 		if(process_pool[i].state == PROCESS_BLOCKED

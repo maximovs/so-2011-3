@@ -47,7 +47,6 @@ char* getConsoleString(int showdata) {
 	int i      = 0;
 	int sx     = getCursorX();
 	int sy     = getCursorY();
-
 	while ((c = getC()) != '\n') {
 		int dirKey = 0;//getA();
 
@@ -93,6 +92,7 @@ char* getConsoleString(int showdata) {
 			}
 		}
 	}
+
 	mcg_putchar(c);
 	clear_screen_topdown();
 	str[i] = 0;

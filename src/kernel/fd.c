@@ -58,7 +58,7 @@ int fd_open (int type, void * data, int perms) {
 
 	if(type == _FD_FIFO) {
 		int key = fifo_exists(data);
-		while(1);
+		// while(1);
 		if(key) {
 			return fd_find(type, key);
 		}

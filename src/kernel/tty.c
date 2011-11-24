@@ -152,13 +152,14 @@ int tty_main (int argc, char ** argv)
 	char * username;
 	char * password;
 	printf("Monix v2 - TTY %d\n", tty_number);
-	printf("Marseillan, Pereyra y Videla v4\n");
+	printf("Marseillan, Pereyra y Videla v7\n");
 	printf("Sistemas Operativos - 2011 - ITBA\n");
 
 	int child;
 	while(1) {
 		switch (status){
 			case 1:
+
 				printf("user@tty%d:", tty_number);
 				input = (char *) getConsoleString(1);
 				process_input(input, tty_number);
