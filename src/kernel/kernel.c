@@ -602,13 +602,13 @@ kmain() {
 	_outb(0x71, (prev & 0xF0) | rate); //write only our rate to A. Note, rate is the bottom 4 bits.
 	
 	
-	// initialize_pics(0x20,0x28);
+
 	scheduler_init();
 
 
 	/* Habilito interrupcion de timer tick*/
-	_mascaraPIC1(0x00);
-	_mascaraPIC2(0x00);
+	_mascaraPIC1(0xFC);
+	_mascaraPIC2(0xFE);
 	
 	_outb(0x70, 0x0B); //set the index to register B
 	prev= _inb(0x71); //read the current value of register B
