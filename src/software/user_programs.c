@@ -24,34 +24,10 @@ int _printHelp(int size, char** args) {
 
 // Test the breakable code
 int _test(int size, char** args) {
-	printf("Beginning test with cache\n");
-	char ** aux;
-	aux = (char**)malloc(2*sizeof(char*));
-	aux[0] = (char*)malloc(2*sizeof(char));
-	aux[1] = (char*)malloc(3*sizeof(char));
-	aux[0][0] = '_';
-	aux[0][1] = 'a';
-	aux[0][2] = 0;
-	aux[1][0] = '3';
-	aux[1][1] = 0;
+	printf("Printing in a random page\n");
 
-	
-	_touch(1, aux);
-	_fbulk(2, aux);
-	_cat(1, aux);
-	_rm(1, aux);
-	
-	printf("Beginning test without cache\n");
-	
-	aux[0][1] = 'b';
-	
-	hdd_goCacheless();
-	_touch(1, aux);
-	_fbulk(2, aux);
-	_cat(1, aux);
-	_rm(1, aux);
-	hdd_goCache();
-	printf("Test done\n");
+	*((char *)0x00000000) = 1;
+	printf("If I'm printing you're screwed\n");
 	
 }
 

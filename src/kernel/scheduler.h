@@ -8,6 +8,9 @@
 #ifndef _SCHEDULER_H_
 #define _SCHEDULER_H_
 
+#define EPSILON PAGESIZE / 2
+#define DELTA	PAGESIZE * 2
+
 ////// Definition of process main.
 typedef int (*main_pointer)(int argc, char **params);
 
@@ -18,7 +21,9 @@ typedef struct Process {
 	unsigned int		gid;
 	unsigned int		priority;
 	char *				name;
-	char				stack[PROCESS_STACK_SIZE];
+//	char				stack[PROCESS_STACK_SIZE];
+	char *				stack;
+	int					stackPages;
 	int					state;
 	int					is_tty;
 	int					tty;

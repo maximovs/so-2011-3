@@ -104,16 +104,18 @@ void fault_handler(struct regs *r)
     //       printf(" Exception.\n");
     //   }
 	char esp=r->int_no;
-    	 
-	*(char*)(0xb8410) = esp % 10 + '0';
-	*(char*)(0xb840e) = (esp / 10) % 10 + '0';
-	*(char*)(0xb840c) = (esp / 100) % 10 + '0';
-	*(char*)(0xb840a) = (esp / 1000) % 10 + '0';
-	*(char*)(0xb8408) = (esp / 10000) % 10 + '0';
-	*(char*)(0xb8406) = (esp / 100000) % 10 + '0';
-	*(char*)(0xb8404) = (esp / 1000000) % 10 + '0';
-	*(char*)(0xb8402) = (esp / 10000000) % 10 + '0';
-	*(char*)(0xb8400) = (esp / 100000000) % 10 + '0';
+	printf("killin process");
+	sigkill_h(getp());
+	
+	//*(char*)(0xb8410) = esp % 10 + '0';
+	//*(char*)(0xb840e) = (esp / 10) % 10 + '0';
+	//*(char*)(0xb840c) = (esp / 100) % 10 + '0';
+	//*(char*)(0xb840a) = (esp / 1000) % 10 + '0';
+	//*(char*)(0xb8408) = (esp / 10000) % 10 + '0';
+	//*(char*)(0xb8406) = (esp / 100000) % 10 + '0';
+	//*(char*)(0xb8404) = (esp / 1000000) % 10 + '0';
+	//*(char*)(0xb8402) = (esp / 10000000) % 10 + '0';
+	//*(char*)(0xb8400) = (esp / 100000000) % 10 + '0';
     	//     	}
 	_Sti();
 }

@@ -83,6 +83,8 @@ struct PagingNamespace {
 	void (*freeMem)(void *, int );
 };
 
+address_t _getFreePages(int npages);
+
 // extern struct system_t System;
 
 #endif
