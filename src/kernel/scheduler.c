@@ -123,13 +123,16 @@ void scheduler_init() {
 		*pool = (char) 0;
 	}
 	for( i=0; i< PROCESS_MAX; i++ ){
-		process_pool[i].stack = (char *)_getFreePages(2);
+		process_pool[i].stack = (char *)_sys_malloc(2*PAGESIZE);
 		process_pool[i].stackPages = 2;
+		process_pool[i].heap = (char *)_sys_malloc(2*PAGESIZE);
+		process_pool[i].heapPages = 2;
 	}
 	
 	i = 0;
 	for(; i < PROCESS_MAX; ++i)	{
 		process_pool[i].state = -1;
+		_pagesDown(process_pool[i]);
 	}
 	ready_queue   = queue_init(PROCESS_MAX);
 	yield_queue   = queue_init(PROCESS_MAX);
@@ -588,6 +591,7 @@ int _pagesDown( Process* p ){
 	int i = 0;
 	for( i = 0; i<p->stackPages; i++ ){
 		_pageDown(p->stack + i*PAGESIZE);
+		_pageDown(p->heap + i*PAGESIZE);
 	}
 	return 1;
 }
@@ -597,6 +601,7 @@ int _pagesUp( Process* p ){
 	int i = 0;
 	for( i = 0; i<p->stackPages; i++ ){
 		_pageUp(p->stack + i*PAGESIZE);
+		_pageUp(p->heap  + i*PAGESIZE);
 	}
 	return 1;
 }

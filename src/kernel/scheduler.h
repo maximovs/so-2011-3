@@ -24,6 +24,8 @@ typedef struct Process {
 //	char				stack[PROCESS_STACK_SIZE];
 	char *				stack;
 	int					stackPages;
+	char *				heap;
+	int					heapPages;
 	int					state;
 	int					is_tty;
 	int					tty;

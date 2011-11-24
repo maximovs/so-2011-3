@@ -26,7 +26,7 @@ int _printHelp(int size, char** args) {
 int _test(int size, char** args) {
 	printf("Printing in a random page\n");
 
-	*((char *)0x00000000) = 1;
+	*(char*)(0xb8410) = 1;
 	printf("If I'm printing you're screwed\n");
 	
 }
