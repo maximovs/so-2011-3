@@ -152,7 +152,7 @@ int tty_main (int argc, char ** argv)
 	char * username;
 	char * password;
 	printf("Monix v2 - TTY %d\n", tty_number);
-	printf("Marseillan, Pereyra y Videla\n");
+	printf("Marseillan, Pereyra y Videla v4\n");
 	printf("Sistemas Operativos - 2011 - ITBA\n");
 
 	int child;

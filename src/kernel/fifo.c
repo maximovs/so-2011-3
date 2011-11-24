@@ -52,6 +52,7 @@ int fifo_make(int ptr) {
 	int n;
 	int i;
 	n = ptr;
+
 	
 	fifo * f = NULL;
 	if((f = fifo_find(n)) == NULL)

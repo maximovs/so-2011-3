@@ -11,9 +11,12 @@
 #include "fs/cache.h"
 #include "fs/hdd.h"
 
+#include "mem/mem.h"
+
 
 ///////////// Inicio de Variables del Kernel
 
+extern struct PagingNamespace Paging;
 /* IDT de 80h entradas*/
 DESCR_INT idt[0x81]; 
 /* IDTR */
@@ -224,7 +227,7 @@ void int_80() {
 			break;
 		case MKFIFO:
 			_fd = process_getfreefd();
- 			fd = fd_open(_FD_FIFO, (void *)kernel_buffer[1],kernel_buffer[2]);
+			fd = fd_open(_FD_FIFO, (void *)kernel_buffer[1],kernel_buffer[2]);
 			if(_fd != -1 && fd != -1)	{
 				getp()->file_descriptors[_fd] = fd;
 				kernel_buffer[KERNEL_RETURN] = _fd;
@@ -522,6 +525,7 @@ void _rtc();
  *************************************************/
 kmain() {
 	int i, num;
+	Paging.start(0x100000);
 	initialize_pics(0x20,0x28);
 	setup_IDT_entry(&idt[0x70], 0x08, (dword) & _rtc, ACS_INT, 0);
 
@@ -595,6 +599,7 @@ kmain() {
 	_outb(0x70, 0x0A); //reset index to A
 	_outb(0x71, (prev & 0xF0) | rate); //write only our rate to A. Note, rate is the bottom 4 bits.
 	
+	
 	// initialize_pics(0x20,0x28);
 	scheduler_init();
 
@@ -609,7 +614,6 @@ kmain() {
 	_outb(0x71, prev | 0x40); //write the previous value or'd with 0x40. This turns on bit 6 of register B
 
 	Sti();
-
 
 
 
