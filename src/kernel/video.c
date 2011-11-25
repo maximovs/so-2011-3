@@ -134,11 +134,11 @@ VIDEO_MODE_INFO* buildVideoMode(int height, int width, int cursorX,
 	video->cursorEnabled = cursorEnabled;
 	video->textMode = textMode;
 	video->visible = 0;
-	video->screen = (char**) malloc(sizeof(char**) * width);
+	video->screen = (char**) malloc(sizeof(char**) * (width+1)); //TODO: fix this for good! to undo, remove +1 from width here and down :)
 	for (i = 0; i < width; i++)	{
 		video->screen[i] = (char*) malloc(sizeof(char*) * height);
 	}
-	video->style = (char**) malloc(sizeof(char**) * width);
+	video->style = (char**) malloc(sizeof(char**) * (width+1));
 	for (i = 0; i < width; i++)	{
 		video->style[i] = (char*) malloc(sizeof(char*) * height);
 	}

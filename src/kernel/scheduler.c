@@ -547,7 +547,7 @@ void scheduler_tick() {
 
 	int i = 0;
 	if( (int)(current_process->stack + current_process->stackPages * PAGESIZE - current_process->esp) < EPSILON ){
-		char * buffer = (char *)s_malloc(PAGESIZE * current_process->stackPages);
+		char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages);
 		int i = 0;
 		for( i = 0; i<PAGESIZE * current_process->stackPages; i++ ){
 			buffer[i] = current_process->stack[i];
@@ -556,7 +556,7 @@ void scheduler_tick() {
 		current_process->stack = (char *) s_malloc(current_process->stackPages + 1);		
 	}
 	else if( current_process->stackPages != 2 && (int)(current_process->stack + current_process->stackPages * PAGESIZE - current_process->esp) > DELTA ){
-		char * buffer = (char *)s_malloc(PAGESIZE * current_process->stackPages -1);
+		char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages -1);
 		int i = 0;
 		for( i = 0; i<PAGESIZE * (current_process->stackPages-1); i++ ){
 			buffer[i] = current_process->stack[i];
