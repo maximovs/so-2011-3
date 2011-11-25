@@ -5,19 +5,20 @@
 //***** All the following code is just not cool, but it works ¨*****//
 
 // char heap_space[1024*1024*16];
-char* heap_space;
+char* heap_space=NULL;
 size_t offset;
 
 // Roughly allocs some memory
 void * malloc(size_t size)
-
 {
-	return s_malloc(size);
-	// void* ret = 0;
-	// ret = heap_space + offset;
-	// offset += size;
-	// return ret;
-	//return (void*)_sys_malloc(size);
+	if(heap_space==NULL)
+		heap_space=_sys_malloc(1024*1024*16);
+	// return s_malloc(size);
+	void* ret = 0;
+	ret = heap_space + offset;
+	offset += size;
+	return ret;
+	// return (void*)_sys_malloc(size);
 }
 
 // Roughly callocs some memory
