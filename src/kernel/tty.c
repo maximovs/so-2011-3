@@ -159,7 +159,6 @@ int tty_main (int argc, char ** argv)
 	while(1) {
 		switch (status){
 			case 1:
-
 				printf("user@tty%d:", tty_number);
 				input = (char *) getConsoleString(1);
 				process_input(input, tty_number);

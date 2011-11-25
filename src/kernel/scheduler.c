@@ -590,23 +590,40 @@ int scheduler_load_esp()
 	return current_process->esp;
 }
 
-//Puts down the pages asigned to the process stack
+//Puts down the pages asigned to the process
 int _pagesDown( Process* p ){
-	int i = 0;
-	for( i = 0; i<p->stackPages; i++ ){
-		_pageDown(p->stack + i*PAGESIZE);
-		_pageDown(p->heap + i*PAGESIZE);
+	return 1;
+	if(p==NULL){ //this should fucking work, case it doesnt, we must make a while which ups every page of every block chained ;)
+		return 1;
 	}
+	int i = 0,pages=p->mem!=NULL?p->mem->npages:0;
+	for (;i<pages;i++){
+		_pageDown(p->mem + i*PAGESIZE);
+	}
+	// 
+	// for( i = 0; i<p->stackPages; i++ ){
+	// 	_pageDown(p->stack + i*PAGESIZE);
+	// 	_pageDown(p->heap + i*PAGESIZE);
+	// }
 	return 1;
 }
 
-//Puts up the pages asigned to the process stack
+//Puts up the pages asigned to the process
 int _pagesUp( Process* p ){
-	int i = 0;
-	for( i = 0; i<p->stackPages; i++ ){
-		_pageUp(p->stack + i*PAGESIZE);
-		_pageUp(p->heap  + i*PAGESIZE);
+	if(p==NULL){
+		return 1;
 	}
+	if(p->mem!=NULL){
+	_pageUp(p->mem);
+	}
+	int i = 1,pages=p->mem!=NULL?p->mem->npages:0;
+	for (;i<pages;i++){
+		_pageUp(p->mem + i*PAGESIZE);
+	}
+	// for( i = 0; i<p->stackPages; i++ ){
+	// 		_pageUp(p->stack + i*PAGESIZE);
+	// 		_pageUp(p->heap  + i*PAGESIZE);
+	// 	}
 	return 1;
 }
 ///////////// Fin Funciones Scheduler

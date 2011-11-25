@@ -107,16 +107,17 @@ void fault_handler(struct regs *r)
 	// printf("killin process"); Nunca va a funcionar xq no se lo ejecuta desde una terminal
 	sigkill_h(getp());
 	
-	*(char*)(0xb8410) = esp % 10 + '0';
-	*(char*)(0xb840e) = (esp / 10) % 10 + '0';
-	*(char*)(0xb840c) = (esp / 100) % 10 + '0';
-	*(char*)(0xb840a) = (esp / 1000) % 10 + '0';
-	*(char*)(0xb8408) = (esp / 10000) % 10 + '0';
-	*(char*)(0xb8406) = (esp / 100000) % 10 + '0';
-	*(char*)(0xb8404) = (esp / 1000000) % 10 + '0';
-	*(char*)(0xb8402) = (esp / 10000000) % 10 + '0';
-	*(char*)(0xb8400) = (esp / 100000000) % 10 + '0';
+	*(char*)(0xb8410 + 80*2*rxz) = esp % 10 + '0';
+	*(char*)(0xb840e + 80*2*rxz) = (esp / 10) % 10 + '0';
+	*(char*)(0xb840c + 80*2*rxz) = (esp / 100) % 10 + '0';
+	*(char*)(0xb840a + 80*2*rxz) = (esp / 1000) % 10 + '0';
+	*(char*)(0xb8408 + 80*2*rxz) = (esp / 10000) % 10 + '0';
+	*(char*)(0xb8406 + 80*2*rxz) = (esp / 100000) % 10 + '0';
+	*(char*)(0xb8404 + 80*2*rxz) = (esp / 1000000) % 10 + '0';
+	*(char*)(0xb8402 + 80*2*rxz) = (esp / 10000000) % 10 + '0';
+	*(char*)(0xb8400 + 80*2*rxz) = (esp / 100000000) % 10 + '0';
     	//     	}
+	rxz++;
 	_Sti();
 }
 ///////////// Fin de Variables del Kernel
@@ -598,7 +599,6 @@ kmain() {
 	idtr.limit = sizeof(idt) - 1;
 
 	_lidt(&idtr);	
-	
 	
 	
 	Cli();

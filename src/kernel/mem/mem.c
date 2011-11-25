@@ -118,6 +118,7 @@ struct PagingNamespace Paging =
 		address += PAGESIZE;
 	}
 
+
 	address_t getPage(void * addr){
 		address_t pgoffset = (address_t) addr % PAGESIZE;
 		return (address_t) addr - pgoffset; 
