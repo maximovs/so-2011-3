@@ -592,7 +592,6 @@ int scheduler_load_esp()
 
 //Puts down the pages asigned to the process
 int _pagesDown( Process* p ){
-	return 1;
 	if(p==NULL){ //this should fucking work, case it doesnt, we must make a while which ups every page of every block chained ;)
 		return 1;
 	}
