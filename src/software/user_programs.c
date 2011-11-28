@@ -883,7 +883,12 @@ int _cacheon(int argc, char ** argv) {
 }
 
 int _cacheoff(int argc, char ** argv) {
+	_cache_flush();
 	hdd_goCacheless();
 	printf("Cache is disabled\n");
 	return 0;
+}
+
+int cache_flush(){
+	return _cache_flush();
 }
