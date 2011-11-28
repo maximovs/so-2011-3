@@ -30,11 +30,11 @@ int _test(int size, char** args) {
 	
 	int i = PAGESIZE*2;
 	
-	Process * p = process_getbypid(1);
+	/*Process * p = process_getbypid(1);
 	for( ; i>PAGESIZE/10; i-- ){
 		printf("%d",p->stack[i]);
-	}
-/*	// int* aw=(int*)getPidStack(4);
+	}*/
+	// int* aw=(int*)getPidStack(4);
 	// printf("%d",aw);
 	// int h=aw[0];
 	// // aw[0]=10;
@@ -68,7 +68,7 @@ int _test(int size, char** args) {
 	printf("Printing in a random page\n");
 	// *(char*)(aux) = 1;
 	*(char*)(0xb8410) = 1;
-	printf("If I'm printing you're screwed\n");*/
+	printf("If I'm printing you're screwed\n");
 	
 }
 
