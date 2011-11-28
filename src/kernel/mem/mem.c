@@ -215,7 +215,7 @@ struct PagingNamespace Paging =
 	}
 
 	int awx=0;
-	int showCount=1;
+	int showCount=0;
 	void* s_malloc(size_t size){
 		block_t newBlock = NULL;
 		if(showCount){

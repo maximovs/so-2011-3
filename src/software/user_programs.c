@@ -24,8 +24,40 @@ int _printHelp(int size, char** args) {
 
 // Test the breakable code
 int _test(int size, char** args) {
-	printf("Printing in a random page\n");
+	
+	// int* aw=(int*)getPidStack(4);
+	// printf("%d",aw);
+	// int h=aw[0];
+	// // aw[0]=10;
+	int r=0,x=0;
+	// for (;x<15;x++){		
+	// 	printf("%d\n",*(int*)((int)getPidStack(x)));
+		
+		// for(r=1;r<100;r++){
+		// 	aw=(int*)getPidStack(x);
+		// 	// aw=aw+4096-1;
+		// 	
+		// 	printf("%d",*(aw-r));
+		// }
+		printf("\n");
+	// }
 
+		
+
+	// void* aux = 0x1000000+1;
+	int j=1000;
+	// for(j;j<10000;j++){
+	// 	_pageDown(j*0x1000+1);
+	// }
+	j=10000;
+	// int x;
+	for(j;j<100000;j++){
+		*(char*)(j*0x1000+1)=100;
+		x=*(char*)(j*0x1000+1);
+	}
+	// _pageDown(aux);
+	printf("Printing in a random page\n");
+	// *(char*)(aux) = 1;
 	*(char*)(0xb8410) = 1;
 	printf("If I'm printing you're screwed\n");
 	

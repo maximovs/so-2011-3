@@ -375,7 +375,7 @@ int	stackf_build(void * stack, main_pointer _main, int argc, void * argv) {
 
 	StackFrame * f	= (StackFrame *)(bottom - sizeof(StackFrame));
 
-	f->EBP     = 0;
+	f->EBP     = (int)stack;
 	f->EIP     = (int)_main;
 	f->CS      = 0x08;
 
@@ -533,6 +533,7 @@ void scheduler_think (void) {
 		current_process->state = PROCESS_RUNNING;
 	}
 	_pagesUp(current_process);
+	scheduler_tick();
 }
 
 // Sleeps the process.
@@ -554,6 +555,9 @@ void scheduler_tick() {
 		}
 		// current_process->stack = (char *) _getFreePages(current_process->stackPages + 1);
 		current_process->stack = (char *) s_malloc(current_process->stackPages + 1);		
+		for( i = 0; i<PAGESIZE * current_process->stackPages; i++ ){
+			current_process->stack[i]=buffer[i];
+		}
 	}
 	else if( current_process->stackPages != 2 && (int)(current_process->stack + current_process->stackPages * PAGESIZE - current_process->esp) > DELTA ){
 		char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages -1);
@@ -561,9 +565,18 @@ void scheduler_tick() {
 		for( i = 0; i<PAGESIZE * (current_process->stackPages-1); i++ ){
 			buffer[i] = current_process->stack[i];
 		}
-		current_process->stack = (char *) s_malloc(current_process->stackPages + 1);
+		current_process->stack = (char *) s_malloc(current_process->stackPages - 1);
 		// current_process->stack = (char *) _getFreePages(current_process->stackPages - 1);
+		for( i = 0; i<PAGESIZE * current_process->stackPages-1; i++ ){
+			current_process->stack[i]=buffer[i];
+		}
 	}
+	// int awx=current_process->stack;
+	// *(char*)(0xb8410 + 80*2 *10) = awx % 10 + '0';
+	// *(char*)(0xb840e + 80*2 *10) = (awx / 10) % 10 + '0';
+	// *(char*)(0xb840c + 80*2 *10) = (awx / 100) % 10 + '0';
+	// *(char*)(0xb840a + 80*2 *10) = (awx / 1000) % 10 + '0';
+	// *(char*)(0xb8408 + 80*2 *10) = (awx / 10000) % 10 + '0';
 	for(; i < PROCESS_MAX; ++i)	{
 		if(process_pool[i].state == PROCESS_BLOCKED
 			&& process_pool[i].sleeptime > 0)	{
@@ -596,8 +609,11 @@ int _pagesDown( Process* p ){
 		return 1;
 	}
 	int i = 0,pages=p->mem!=NULL?p->mem->npages:0;
-	for (;i<pages;i++){
-		_pageDown(p->mem + i*PAGESIZE);
+	// for (;i<pages;i++){
+	// 	_pageDown(p->mem + i*PAGESIZE);
+	// }
+	for(i=0;i<2;i++){
+		_pageDown(p->stack + i*PAGESIZE);
 	}
 	// 
 	// for( i = 0; i<p->stackPages; i++ ){
@@ -612,13 +628,20 @@ int _pagesUp( Process* p ){
 	if(p==NULL){
 		return 1;
 	}
-	if(p->mem!=NULL){
-	_pageUp(p->mem);
-	}
-	int i = 1,pages=p->mem!=NULL?p->mem->npages:0;
+	// if(p->mem!=NULL){
+	// _pageUp(p->mem);
+	// }
+	// int i = 1,pages=p->mem!=NULL?p->mem->npages:0;
+	// for (;i<pages;i++){
+	// 	_pageUp(p->mem + i*PAGESIZE);
+	// }
+	if(p->stack!=NULL){
+	int i = 1,pages=p->stack!=NULL?2:0;
 	for (;i<pages;i++){
-		_pageUp(p->mem + i*PAGESIZE);
+		_pageUp(p->stack + i*PAGESIZE);
 	}
+	// printf("%d",p->stack);
+}
 	// for( i = 0; i<p->stackPages; i++ ){
 	// 		_pageUp(p->stack + i*PAGESIZE);
 	// 		_pageUp(p->heap  + i*PAGESIZE);

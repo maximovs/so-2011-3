@@ -30,6 +30,9 @@ void clear_kernel_buffer() {
 	}
 }
 
+void* getPidStack(int pid){
+	return process_getbypindex(pid)->stack;
+}
 
 /*************************************************************
 *initialize_pics
@@ -106,16 +109,19 @@ void fault_handler(struct regs *r)
 	char esp=r->int_no;
 	// printf("killin process"); Nunca va a funcionar xq no se lo ejecuta desde una terminal
 	sigkill_h(getp());
-	
-	*(char*)(0xb8410 + 80*2*rxz) = esp % 10 + '0';
-	*(char*)(0xb840e + 80*2*rxz) = (esp / 10) % 10 + '0';
-	*(char*)(0xb840c + 80*2*rxz) = (esp / 100) % 10 + '0';
-	*(char*)(0xb840a + 80*2*rxz) = (esp / 1000) % 10 + '0';
-	*(char*)(0xb8408 + 80*2*rxz) = (esp / 10000) % 10 + '0';
-	*(char*)(0xb8406 + 80*2*rxz) = (esp / 100000) % 10 + '0';
-	*(char*)(0xb8404 + 80*2*rxz) = (esp / 1000000) % 10 + '0';
-	*(char*)(0xb8402 + 80*2*rxz) = (esp / 10000000) % 10 + '0';
-	*(char*)(0xb8400 + 80*2*rxz) = (esp / 100000000) % 10 + '0';
+	int a=0;
+	for(a;a<strlen(exception_messages[esp]);a++){
+		*(char*)(0xb8410 + 80*2*(rxz+1) + 2*a) = exception_messages[esp][a];
+	}
+	// *(char*)(0xb8410 + 80*2*rxz) = esp % 10 + '0';
+	// *(char*)(0xb840e + 80*2*rxz) = (esp / 10) % 10 + '0';
+	// *(char*)(0xb840c + 80*2*rxz) = (esp / 100) % 10 + '0';
+	// *(char*)(0xb840a + 80*2*rxz) = (esp / 1000) % 10 + '0';
+	// *(char*)(0xb8408 + 80*2*rxz) = (esp / 10000) % 10 + '0';
+	// *(char*)(0xb8406 + 80*2*rxz) = (esp / 100000) % 10 + '0';
+	// *(char*)(0xb8404 + 80*2*rxz) = (esp / 1000000) % 10 + '0';
+	// *(char*)(0xb8402 + 80*2*rxz) = (esp / 10000000) % 10 + '0';
+	// *(char*)(0xb8400 + 80*2*rxz) = (esp / 100000000) % 10 + '0';
     	//     	}
 	rxz++;
 	_Sti();
@@ -535,7 +541,7 @@ void _rtc();
  *************************************************/
 kmain() {
 	int i, num;
-	Paging.start(0x100000);
+	Paging.start(0x200000);
 	initialize_pics(0x20,0x70);
 	setup_IDT_entry(&idt[0x70], 0x08, (dword) & _rtc, ACS_INT, 0);
 
