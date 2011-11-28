@@ -69,26 +69,26 @@ int _cache_write(int ata, char * msg, int numreads, unsigned int sector){
 		for( j=0; j<SECTOR_SIZE; j++ ){
 			sectors[i].data[j] = msg[j];
 		}
-		_disk_write( ata, sectors[i].data, 1, sector);
+	//	_disk_write( ata, sectors[i].data, 1, sector);
 		sectors[i].used = 1;
-		sectors[i].dirty = 0;
+		sectors[i].dirty = 1;
 
 	}
 	if( numreads == 1 ){
 		return 1;
 	}
 	
-	return _cache_read( ata, msg + SECTOR_SIZE, numreads-1, sector+1);
+	return _cache_write( ata, msg + SECTOR_SIZE, numreads-1, sector+1);
 }
 
 
 int _cache_flush(void){
 	int i = 0;
 	for( i=0; i<SECTORS; i++ ){
-		if( sectors[i].used  /*sectors[i].dirty*/ ){
+		if( sectors[i].used && sectors[i].dirty ){
 			_disk_write( ATA0, sectors[i].data, 1, sectors[i].index );
 		}
-//		sectors[i].used = 0;
+		sectors[i].used = 0;
 	}
 	return 1;
 }
@@ -101,9 +101,14 @@ int getFree(){
 			return i;
 		}
 	}
-	if( sectors[count%SECTORS].dirty ){
-		_disk_write( ATA0, sectors[count%SECTORS].data, 1, sectors[count%SECTORS].index);
+	if( sectors[SECTORS-count%SECTORS-1].dirty ){
+		_disk_write( ATA0, sectors[SECTORS-count%SECTORS-1].data, 1, sectors[SECTORS-count%SECTORS-1].index);
+		sectors[SECTORS-count%SECTORS-1].dirty = 0;
 	}
-	sectors[count%SECTORS].used = 0;
-	return count++%SECTORS;
+	sectors[SECTORS-count%SECTORS-1].used = 0;
+	return SECTORS-count++%SECTORS-1;
+}
+
+int getThing(int index){
+	return sectors[index].index;
 }

@@ -6,6 +6,8 @@
 #include "../kernel/fs/fs.h"
 #include "../libs/heap.h"
 #include "../kernel/fs/hdd.h"
+#include "../kernel/mem/mem.h"
+#include "../kernel/fs/cache.h"
 
 typedef struct top_data {
 	int pid;
@@ -25,7 +27,14 @@ int _printHelp(int size, char** args) {
 // Test the breakable code
 int _test(int size, char** args) {
 	
-	// int* aw=(int*)getPidStack(4);
+	
+	int i = PAGESIZE*2;
+	
+	Process * p = process_getbypid(1);
+	for( ; i>PAGESIZE/10; i-- ){
+		printf("%d",p->stack[i]);
+	}
+/*	// int* aw=(int*)getPidStack(4);
 	// printf("%d",aw);
 	// int h=aw[0];
 	// // aw[0]=10;
@@ -59,7 +68,7 @@ int _test(int size, char** args) {
 	printf("Printing in a random page\n");
 	// *(char*)(aux) = 1;
 	*(char*)(0xb8410) = 1;
-	printf("If I'm printing you're screwed\n");
+	printf("If I'm printing you're screwed\n");*/
 	
 }
 
@@ -890,5 +899,10 @@ int _cacheoff(int argc, char ** argv) {
 }
 
 int cache_flush(){
+	int i = 0;
+	
+	for( i=0; i<SECTORS; i++ ){
+		printf("Sector: %d\n", getThing(i));
+	}
 	return _cache_flush();
 }

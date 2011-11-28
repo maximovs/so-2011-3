@@ -16,7 +16,6 @@
 static int cache;
 
 void hdd_init() {
-	// Nothing to do on this end.
 	cache = 0;
 }
 
