@@ -10,6 +10,7 @@
 // #include "../kernel/mem/mem.h"
 #include "../kernel/paging/page.h"
 #include "../kernel/fs/cache.h"
+#include "../kernel/scheduler.h"
 
 typedef struct top_data {
 	int pid;
@@ -19,6 +20,8 @@ typedef struct top_data {
 int proc_comparer(top_data * t1, top_data * t2) {
 	return t2->ticks - t1->ticks;
 }
+
+int recu(int num);
 
 // Helps teachers to understand a bit our mess, well, no
 int _printHelp(int size, char** args) {
@@ -40,7 +43,7 @@ int _test(int size, char** args) {
 	// printf("%d",aw);
 	// int h=aw[0];
 	// // aw[0]=10;
-	int r=0,x=0;
+//	int r=0,x=0;
 	// for (;x<15;x++){		
 	// 	printf("%d\n",*(int*)((int)getPidStack(x)));
 		
@@ -57,8 +60,12 @@ int _test(int size, char** args) {
 	// takedown_user_page((void*)(getPidStack(4)), 7, 0);
 	
 // takedown_user_page((void*)(0x10000004-6 -4096), 6, 0);
-	*(int*)getPidStack(getpid()-1)=3;
-// takedown_user_page((void*)(0x10000004-6 -4096), 7, 0);
+		printf("Printing current process stack\n");
+//		*(int*)getPidStack(getpid()) = 3;
+		printf("Done\n");
+		printf("Printing another process stack\n");
+		*(int*)getPidStack(getpid()-1) = 3;
+/*// takedown_user_page((void*)(0x10000004-6 -4096), 7, 0);
 		// _page_down((void*)0x10000004-6);
 			// *(char*)(0x10000004 -6 -4096)=(char)4;
 					// *(char*)(0x1000 * 20 +1)=(char)4;
@@ -78,21 +85,16 @@ int _test(int size, char** args) {
 	// _pageDown(aux);
 	printf("Printing in a random page\n");
 	// *(char*)(aux) = 1;
-	*(char*)(0xb8410) = 1;
+	*(char*)(0xb8410) = 1;*/
 	printf("If I'm printing you're screwed\n");
 	
 }
 
+
 // Just to have more functions in the autocomplete
-int _ssh(int size, char** args) {
-	printf("Attempting to connect...\n");
-	printf("Oooops we forgot our internals don't have any TCP/IP backend...\n");
-	printf("You'll have to wait for MurcielagOS 2.0 or maybe 11.0 to see this working\n");
-	printf("Take a seat and wait!!!\n");
-	printf("...\n");
-	printf("...\n");
-	printf("...\n");
-	printf("Our autocomplete looked just empty so we made this :)\n");
+int _test2(int size, char** args) {
+	printf("AOAOAOA");
+	return recu(500);
 }
 
 // Clears the screen
@@ -916,4 +918,20 @@ int cache_flush(){
 		printf("Sector: %d\n", getThing(i));
 	}
 	return _cache_flush();
+}
+
+
+int recu(int num){
+	
+	printf("Stack: %d, ESP: %d, Iteration: %d\n", getStack((int)(getp()->stack)), getp()->esp, num);
+	int a[200];
+	a[2] = 1;
+	if(num == 0){
+		return 1;
+	}
+	else if( num%5 ){
+		softyield();
+	}
+	recu(num-1);
+	return 1;
 }

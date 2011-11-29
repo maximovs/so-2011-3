@@ -129,8 +129,8 @@ void scheduler_init() {
 		// process_pool[i].stack = (char *)get_stack_start(i*4096);
 		process_pool[i].stack = (char *)st_malloc(i);
 		process_pool[i].stackPages = 2;
-		process_pool[i].heap = (char *)malloc(2*PAGESIZE);
-		process_pool[i].heapPages = 2;
+//		process_pool[i].heap = (char *)malloc(2*PAGESIZE);
+//		process_pool[i].heapPages = 2;
 		int j=0;
 		for(j=0;j<process_pool[i].stackPages+2;j++){ //#TODO: check!
 		takedown_user_page((void*)(process_pool[i].stack + j*PAGESIZE), 7, 0);
@@ -336,14 +336,14 @@ int sched_pcreate(char * name, int argc, void * params) {
 }
 
 // User processes names
-char* _function_names[] = { "help", "writemem", "clear", "ssh", "hola", "reader", "writer", 
+char* _function_names[] = { "help", "writemem", "clear", "forcestack", "hola", "reader", "writer", 
 	"kill", "getc", "putc", "top", "hang", "setp", "setsched", "dcheck", 
 	"dread", "dwrite", "dfill", "ls", "cd", "pwd", "mkdir", "rm", "touch", "cat", "fwrite",
 	"logout", "makeuser", "setgid", "udelete", "chown", "chmod", "getown", "getmod", "fbulk",
 	"finfo", "su", "link", "cp", "mv", "smallhang", "fsstat", "cacheon", "cacheoff", "flush", NULL };
 
 // User processes pointers
-int ((*_functions[])(int, char**)) = { _printHelp, _test, _clear, _ssh, _hola_main, 
+int ((*_functions[])(int, char**)) = { _printHelp, _test, _clear, _test2, _hola_main, 
 	reader_main, writer_main, _kill, getc_main, putc_main, top_main, _hang, 
 	_setp, _setsched, _dcheck, _dread, _dwrite, _dfill, _ls, _cd, _pwd, _mkdir, _rm, _touch,
 	_cat, _fwrite, _logout, _makeuser, _setgid, _udelete, _chown, _chmod, _getown, _getmod, _fbulk,
@@ -556,7 +556,8 @@ int scheduler_sleep(int msecs) {
 void scheduler_tick() {
 	// return;
 	int i = 0;
-	if( (int)(current_process->stack + current_process->stackPages * PAGESIZE - current_process->esp) < EPSILON ){
+	int bottom = (int)current_process->stack + PROCESS_STACK_SIZE -1;
+	if( current_process->esp - (bottom - current_process->stackPages * PAGESIZE) < EPSILON ){
 		// char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages);
 		// 	int i = 0;
 		// 	for( i = 0; i<PAGESIZE * current_process->stackPages; i++ ){
@@ -568,13 +569,12 @@ void scheduler_tick() {
 		// 		current_process->stack[i]=buffer[i];
 		// 	}
 		// int j=0;
-		current_process->stackPages=current_process->stackPages+1;
-		takedown_user_page((void*)(current_process->stack + (current_process->stackPages-1 + 2)*PAGESIZE), 7, 0); // #TODO: check!
+		takedown_user_page( (void *)(bottom - ++current_process->stackPages * PAGESIZE), 7, 0);
 		// for(j=0;j<current_process->stackPages;j++){
 		// 			takedown_user_page((void*)(current_process->stack + j*PAGESIZE), 7, 0);
 		// 		}
 	}
-	else if( current_process->stackPages != 2 && (int)(current_process->stack + current_process->stackPages * PAGESIZE - current_process->esp) > DELTA ){
+	else if( current_process->stackPages != 2 && current_process->esp - (bottom - current_process->stackPages * PAGESIZE) > DELTA ){
 		// char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages -1);
 		// int i = 0;
 		// for( i = 0; i<PAGESIZE * (current_process->stackPages-1); i++ ){
@@ -586,8 +586,7 @@ void scheduler_tick() {
 		// 	current_process->stack[i]=buffer[i];
 		// }
 			
-			takedown_user_page((void*)(current_process->stack + (current_process->stackPages-1 + 2)*PAGESIZE), 6, 0); // #TODO: check!
-			current_process->stackPages=current_process->stackPages-1;
+			takedown_user_page((void*)(bottom - current_process->stackPages-- * PAGESIZE), 6, 0); // #TODO: check!
 	}
 	// int awx=current_process->stack;
 	// *(char*)(0xb8410 + 80*2 *10) = awx % 10 + '0';
@@ -670,7 +669,7 @@ int _pagesUp( Process* p ){
 		// _pageUp(p->stack + i*PAGESIZE);
 	}
 	// printf("%d",p->stack);
-}
+	}
 	// for( i = 0; i<p->stackPages; i++ ){
 	// 		_pageUp(p->stack + i*PAGESIZE);
 	// 		_pageUp(p->heap  + i*PAGESIZE);
@@ -678,3 +677,7 @@ int _pagesUp( Process* p ){
 	return 1;
 }
 ///////////// Fin Funciones Scheduler
+
+int getStack( int stack ){
+	return stack + PAGESIZE * 1024 -1;
+}
