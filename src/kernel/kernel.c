@@ -11,12 +11,14 @@
 #include "fs/cache.h"
 #include "fs/hdd.h"
 
-#include "mem/mem.h"
+#include "paging/page.h"
+// #include "paging/mall.h"
+// #include "mem/mem.h"
 
 
 ///////////// Inicio de Variables del Kernel
 
-extern struct PagingNamespace Paging;
+// extern struct PagingNamespace Paging;
 /* IDT de 80h entradas*/
 DESCR_INT idt[0x101]; 
 /* IDTR */
@@ -541,7 +543,9 @@ void _rtc();
  *************************************************/
 kmain() {
 	int i, num;
-	Paging.start(0x200000);
+	// Paging.start(0x200000);
+	// init_malloc();
+	
 	initialize_pics(0x20,0x70);
 	setup_IDT_entry(&idt[0x70], 0x08, (dword) & _rtc, ACS_INT, 0);
 
@@ -615,8 +619,9 @@ kmain() {
 	_outb(0x71, (prev & 0xF0) | rate); //write only our rate to A. Note, rate is the bottom 4 bits.
 	
 		
-
+		init_paging();
 	scheduler_init();
+
 
 
 	/* Habilito interrupcion de timer tick*/

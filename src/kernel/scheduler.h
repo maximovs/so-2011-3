@@ -1,7 +1,8 @@
 #include "../../include/kernel.h"
 #include "../../include/kasm.h"
 #include "../../include/defs.h"
-#include "mem/mem.h"
+#include "paging/page.h"
+// #include "mem/mem.h"
 
 #include "../libs/queue.h"
 #include "../monix/monix.h"
@@ -18,6 +19,7 @@ typedef int (*main_pointer)(int argc, char **params);
 ////// Proper definition of Process
 typedef struct Process {
 	unsigned int		pid;
+	unsigned int	  pdir;
 	unsigned int		ppid;
 	unsigned int		gid;
 	unsigned int		priority;

@@ -37,6 +37,9 @@ typedef short int					ssize_t;
 #define	ICW1		0x11
 #define	ICW4_8086	0x01
 
+#define PAGESIZE 4096
+
+typedef unsigned int uint32_t;
 
 struct block_t {
 	struct block_t * next;

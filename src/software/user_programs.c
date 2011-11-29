@@ -2,11 +2,13 @@
 #include "../monix/monix.h"
 #include "../libs/pqueue.h"
 #include "../libs/mcglib.h"
+#include "../libs/stdlib.h"
 #include "../drivers/atadisk.h"
 #include "../kernel/fs/fs.h"
 #include "../libs/heap.h"
 #include "../kernel/fs/hdd.h"
-#include "../kernel/mem/mem.h"
+// #include "../kernel/mem/mem.h"
+#include "../kernel/paging/page.h"
 #include "../kernel/fs/cache.h"
 
 typedef struct top_data {
@@ -23,12 +25,12 @@ int _printHelp(int size, char** args) {
 	printf("MonkeyOS 1 - MurcielagOS kernel v0.1 (i686-pc-murcielago)\n");
 	printf("These shell commands are defined internally.  Type `help' to see this list.\n");
 }
-
+static int qu=0;
 // Test the breakable code
 int _test(int size, char** args) {
 	
 	
-	int i = PAGESIZE*2;
+	// int i = PAGESIZE*2;
 	
 	/*Process * p = process_getbypid(1);
 	for( ; i>PAGESIZE/10; i-- ){
@@ -48,10 +50,19 @@ int _test(int size, char** args) {
 		// 	
 		// 	printf("%d",*(aw-r));
 		// }
-		printf("\n");
+		// printf("%d\n",(int)getPage(0x100000+1+(4096*qu)));
+		// printf("%d\n",(int)getPage(0x100000+(4096*qu)));
+		// printf("%d\n",(int)getPage(0x100000-1+(4096*qu++)));
 	// }
-
-		
+	// takedown_user_page((void*)(getPidStack(4)), 7, 0);
+	
+// takedown_user_page((void*)(0x10000004-6 -4096), 6, 0);
+	*(int*)getPidStack(getpid()-1)=3;
+// takedown_user_page((void*)(0x10000004-6 -4096), 7, 0);
+		// _page_down((void*)0x10000004-6);
+			// *(char*)(0x10000004 -6 -4096)=(char)4;
+					// *(char*)(0x1000 * 20 +1)=(char)4;
+						// *(char*)(0x1000 * 20 -1)=(char)4;
 
 	// void* aux = 0x1000000+1;
 	int j=1000;
@@ -60,10 +71,10 @@ int _test(int size, char** args) {
 	// }
 	j=10000;
 	// int x;
-	for(j;j<100000;j++){
-		*(char*)(j*0x1000+1)=100;
-		x=*(char*)(j*0x1000+1);
-	}
+	// for(j;j<100000;j++){
+	// 	*(char*)(j*0x1000+1)=100;
+	// 	x=*(char*)(j*0x1000+1);
+	// }
 	// _pageDown(aux);
 	printf("Printing in a random page\n");
 	// *(char*)(aux) = 1;

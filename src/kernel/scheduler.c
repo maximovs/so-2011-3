@@ -7,6 +7,8 @@
 #include "../libs/string.h"
 #include "../libs/queue.h"
 #include "../libs/mcglib.h"
+#include "../libs/stdlib.h"
+#include "paging/page.h"
 #include "../monix/monix.h"
 
 int _first_time          = 0;
@@ -123,10 +125,16 @@ void scheduler_init() {
 	}
 	
 	for( i=0; i< PROCESS_MAX; i++ ){
-		process_pool[i].stack = (char *)s_malloc(2*PAGESIZE);
+		
+		// process_pool[i].stack = (char *)get_stack_start(i*4096);
+		process_pool[i].stack = (char *)st_malloc(i);
 		process_pool[i].stackPages = 2;
-		process_pool[i].heap = (char *)s_malloc(2*PAGESIZE);
+		process_pool[i].heap = (char *)malloc(2*PAGESIZE);
 		process_pool[i].heapPages = 2;
+		int j=0;
+		for(j=0;j<process_pool[i].stackPages+2;j++){ //#TODO: check!
+		takedown_user_page((void*)(process_pool[i].stack + j*PAGESIZE), 7, 0);
+		}
 	}
 	
 	i = 0;
@@ -375,7 +383,7 @@ int	stackf_build(void * stack, main_pointer _main, int argc, void * argv) {
 
 	StackFrame * f	= (StackFrame *)(bottom - sizeof(StackFrame));
 
-	f->EBP     = (int)stack;
+	f->EBP     = 0;
 	f->EIP     = (int)_main;
 	f->CS      = 0x08;
 
@@ -393,7 +401,9 @@ int is_tty, int stdin, int stdout, int stderr, int argc, void * params, int queu
 	Process * p            = process_getfree();
 	p->name                = name;
 	p->pid                 = process_getnextpid();
+	// p->pdir                = create_proc_ptable();
 	p->gid                 = 0;
+	// p->stack               = get_stack_start(p->pdir);
 	p->ppid                = (current_process != NULL) ? current_process->pid : 0;
 	p->priority            = priority;
 	p->esp                 = stackf_build(p->stack, _main, argc, params);
@@ -420,7 +430,7 @@ int is_tty, int stdin, int stdout, int stderr, int argc, void * params, int queu
 	} else if(!queue_block)	{
 		sched_enqueue( p);
 	}
-
+	
 
 	return p;
 }
@@ -471,9 +481,8 @@ void scheduler_think (void) {
 	if(atomic || in_kernel()) {
 		return;
 	}
-	
 	_pagesDown(current_process);
-
+	takedown_user_page((void*)(current_process->stack ), 7, 0);
 	// Handles the yields
 	if(yielded == 0) {
 		while(!queue_isempty(yield_queue)) {
@@ -496,13 +505,13 @@ void scheduler_think (void) {
 	// If the scheduler is not empty then we take one out of there
 	if (!sched_isempty()) {
 		current_process = sched_dequeue();
-		
+		takedown_user_page((void*)(current_process->stack), 7, 0);
 		// Process wakeup
 		if (current_process->state == PROCESS_BLOCKED) {
 			current_process->state = PROCESS_READY;
 			soft_yielded = 1;
 		}
-	
+		
 		// Proccess dead? next one!
 		if (current_process->state == PROCESS_ZOMBIE) {
 			softyield();
@@ -545,31 +554,40 @@ int scheduler_sleep(int msecs) {
 
 // Handles the ticks
 void scheduler_tick() {
-
+	// return;
 	int i = 0;
 	if( (int)(current_process->stack + current_process->stackPages * PAGESIZE - current_process->esp) < EPSILON ){
-		char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages);
-		int i = 0;
-		for( i = 0; i<PAGESIZE * current_process->stackPages; i++ ){
-			buffer[i] = current_process->stack[i];
-		}
-		// current_process->stack = (char *) _getFreePages(current_process->stackPages + 1);
-		current_process->stack = (char *) s_malloc(current_process->stackPages + 1);		
-		for( i = 0; i<PAGESIZE * current_process->stackPages; i++ ){
-			current_process->stack[i]=buffer[i];
-		}
+		// char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages);
+		// 	int i = 0;
+		// 	for( i = 0; i<PAGESIZE * current_process->stackPages; i++ ){
+		// 		buffer[i] = current_process->stack[i];
+		// 	}
+		// 	// current_process->stack = (char *) _getFreePages(current_process->stackPages + 1);
+		// 	current_process->stack = (char *) malloc(current_process->stackPages + 1);		
+		// 	for( i = 0; i<PAGESIZE * current_process->stackPages; i++ ){
+		// 		current_process->stack[i]=buffer[i];
+		// 	}
+		// int j=0;
+		current_process->stackPages=current_process->stackPages+1;
+		takedown_user_page((void*)(current_process->stack + (current_process->stackPages-1 + 2)*PAGESIZE), 7, 0); // #TODO: check!
+		// for(j=0;j<current_process->stackPages;j++){
+		// 			takedown_user_page((void*)(current_process->stack + j*PAGESIZE), 7, 0);
+		// 		}
 	}
 	else if( current_process->stackPages != 2 && (int)(current_process->stack + current_process->stackPages * PAGESIZE - current_process->esp) > DELTA ){
-		char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages -1);
-		int i = 0;
-		for( i = 0; i<PAGESIZE * (current_process->stackPages-1); i++ ){
-			buffer[i] = current_process->stack[i];
-		}
-		current_process->stack = (char *) s_malloc(current_process->stackPages - 1);
-		// current_process->stack = (char *) _getFreePages(current_process->stackPages - 1);
-		for( i = 0; i<PAGESIZE * current_process->stackPages-1; i++ ){
-			current_process->stack[i]=buffer[i];
-		}
+		// char * buffer = (char *)malloc(PAGESIZE * current_process->stackPages -1);
+		// int i = 0;
+		// for( i = 0; i<PAGESIZE * (current_process->stackPages-1); i++ ){
+		// 	buffer[i] = current_process->stack[i];
+		// }
+		// current_process->stack = (char *) malloc(current_process->stackPages - 1);
+		// // current_process->stack = (char *) _getFreePages(current_process->stackPages - 1);
+		// for( i = 0; i<PAGESIZE * current_process->stackPages-1; i++ ){
+		// 	current_process->stack[i]=buffer[i];
+		// }
+			
+			takedown_user_page((void*)(current_process->stack + (current_process->stackPages-1 + 2)*PAGESIZE), 6, 0); // #TODO: check!
+			current_process->stackPages=current_process->stackPages-1;
 	}
 	// int awx=current_process->stack;
 	// *(char*)(0xb8410 + 80*2 *10) = awx % 10 + '0';
@@ -584,10 +602,11 @@ void scheduler_tick() {
 			if(!process_pool[i].sleeptime)	{
 				process_pool[i].state = PROCESS_READY;
 				sched_enqueue(&process_pool[i]);
-
+	
 			}
 		} 
 	}
+	
 	_outb(0x70, 0x0C);
 	_inb(0x71);
 }
@@ -608,12 +627,14 @@ int _pagesDown( Process* p ){
 	if(p==NULL){ //this should fucking work, case it doesnt, we must make a while which ups every page of every block chained ;)
 		return 1;
 	}
+	
 	int i = 0,pages=p->mem!=NULL?p->mem->npages:0;
 	// for (;i<pages;i++){
 	// 	_pageDown(p->mem + i*PAGESIZE);
 	// }
-	for(i=0;i<2;i++){
-		_pageDown(p->stack + i*PAGESIZE);
+	for(i=0;i<1;i++){
+		// _pageDown(p->stack + i*PAGESIZE);
+		// takedown_user_page((void*)(p->stack + i*PAGESIZE), 6, 0);
 	}
 	// 
 	// for( i = 0; i<p->stackPages; i++ ){
@@ -625,6 +646,13 @@ int _pagesDown( Process* p ){
 
 //Puts up the pages asigned to the process
 int _pagesUp( Process* p ){
+	int j;
+	for(j=0;j<PROCESS_MAX;j++){
+			if(process_pool[j].state!=-1 && process_pool[j].pid != p->pid){
+				// _pagesDown(&process_pool[j]);
+				takedown_user_page((void*)(process_pool[j].stack), 6, 0);
+			}
+		}
 	if(p==NULL){
 		return 1;
 	}
@@ -636,9 +664,10 @@ int _pagesUp( Process* p ){
 	// 	_pageUp(p->mem + i*PAGESIZE);
 	// }
 	if(p->stack!=NULL){
-	int i = 1,pages=p->stack!=NULL?2:0;
+	int i = 0,pages=p->stack!=NULL?2:0;
 	for (;i<pages;i++){
-		_pageUp(p->stack + i*PAGESIZE);
+		takedown_user_page((void*)(p->stack + i*PAGESIZE), 7, 0);
+		// _pageUp(p->stack + i*PAGESIZE);
 	}
 	// printf("%d",p->stack);
 }
